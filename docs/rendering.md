@@ -2,6 +2,13 @@
 
 Every renderer implements `RendererInterface::render(DiffResult|DiffBundle): string`. An empty result produces an empty string, except that `UnifiedRenderer` can still emit explicitly configured labels.
 
+| Destination | Renderer | Integration |
+| --- | --- | --- |
+| Patch or review text | `UnifiedRenderer` | Preserve newline markers and labels. |
+| Web page | `HtmlRenderer` | Add application CSS; source text is already escaped. |
+| Data/API | `JsonRenderer` | Consume structured edits and metadata. |
+| Terminal | `AnsiSideBySideRenderer` | Select a width suitable for the terminal. |
+
 ## Unified diff
 
 Use `UnifiedRenderer` for familiar line-oriented output. Its optional constructor arguments label the old and new versions.

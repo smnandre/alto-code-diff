@@ -37,6 +37,11 @@ echo count($result->hunks())." changed region(s)\n";
 
 `compare()` throws `SizeLimitException` when either input exceeds the configured limit and `BinaryInputException` when an input appears to contain binary data. Binary detection checks null bytes and excessive control characters near the beginning of the input.
 
+If a size limit is reached, compare smaller meaningful units or deliberately
+raise `maxBytes()` after accounting for memory and execution time. Do not retry
+binary input as text; decode it to an appropriate textual representation first.
+Use a different tool when a binary comparison is required.
+
 ## Inspect the result
 
 `DiffResult::isEmpty()` reports whether the inputs differ. `hunks()` returns the changed regions, while the newline flags preserve whether each input ended with a line break.

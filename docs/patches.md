@@ -112,3 +112,48 @@ The constructor accepts `fuzz` and `maxBytes`, both defaulting to `0` and `5_000
 Use `applyBundle(array $files, DiffBundle $bundle): array` for multiple files. The input and result use `path => content` maps.
 
 The method handles modifications, renames, creations from `/dev/null`, and deletions to `/dev/null`. It throws `PatchApplyException` when a required source path is missing or a hunk cannot be matched. The library returns updated content but never writes it to disk.
+
+
+## Verify a complete round trip
+
+This example keeps every file in memory. The package does not open the paths:
+
+```php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+use Alto\Code\Diff\Diff;
+use Alto\Code\Diff\Model\DiffBundle;
+use Alto\Code\Diff\Model\DiffFile;
+use Alto\Code\Diff\Patch\PatchApplier;
+use Alto\Code\Diff\Patch\UnifiedEmitter;
+use Alto\Code\Diff\Patch\UnifiedParser;
+
+$files = ['a.txt' => "old\n", 'b.txt' => "keep\n"];
+$change = new DiffFile('a.txt', 'a.txt', Diff::build()->compare($files['a.txt'], "new\n"));
+$patch = (new UnifiedEmitter())->emit(new DiffBundle([$change]));
+$bundle = (new UnifiedParser())->parse($patch);
+$updated = (new PatchApplier())->applyBundle($files, $bundle);
+echo json_encode($updated, JSON_THROW_ON_ERROR), "\n";
+```
+
+Output:
+
+```text
+{"a.txt":"new\n","b.txt":"keep\n"}
+```
+
+## Recover from a rejected patch
+
+| Failure | What to check before retrying |
+| --- | --- |
+| `ParseException` | Preserve the patch headers, prefixes, and hunk counts; obtain a complete unified patch rather than guessing missing lines. |
+| `BinaryInputException` | Supply a text patch; binary Git patches are not supported. |
+| `PatchApplyException` | Match the original source revision and required path keys; inspect `hunkIndex` for a failed hunk. |
+| `SizeLimitException` | Check input sizes and the configured limit before deliberately raising it. |
+
+Fuzz searches nearby line positions; it is not conflict resolution and does not
+ignore different source text. If the patch applies to another revision, regenerate
+it against the intended base. Keep the returned map separate until your application
+has decided how to persist it; the package performs no file writes.

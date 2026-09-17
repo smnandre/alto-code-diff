@@ -18,3 +18,9 @@ Alto Code Diff compares text, renders structured differences, and parses, emits,
 - [Patches](patches.md) parses, emits, and applies single-file or multi-file unified patches.
 
 The package rejects binary input and does not read files, execute Git, or resolve patch conflicts automatically.
+
+## Package
+
+- [Changelog](https://github.com/altophp/code-diff/blob/main/CHANGELOG.md)
+- [Contributing](https://github.com/altophp/code-diff/blob/main/CONTRIBUTING.md)
+- [Support](https://github.com/altophp/code-diff/blob/main/SUPPORT.md)
