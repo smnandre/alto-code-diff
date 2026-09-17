@@ -29,6 +29,10 @@ The output is a standard unified diff:
 +line two changed
 ```
 
+The returned diff string has no final line break. Append `PHP_EOL` when your
+output destination requires a trailing newline. Source newline-at-EOF metadata
+is preserved separately in the diff result.
+
 `Diff::build()` creates an immutable builder. Each configuration method returns a new instance, so a configured builder can be reused safely.
 
 Next, configure the [comparison](comparison.md), select another [renderer](rendering.md), or work with [patches](patches.md).
